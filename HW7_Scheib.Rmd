@@ -1,0 +1,188 @@
+---
+title: "Homework 7" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+library(tidyverse)
+```
+
+```{r}
+set.seed(09042001)
+```
+
+## Problem 1   
+```{r}
+ggplot(data.frame(X=c(0,20)), aes(x=X)) + stat_function(fun=dchisq, args=list(df=3))
+```
+The chi-squared distribution with 3 degrees of freedom is skewed considerably to the right.
+
+\newpage
+## Problem 2
+### Part a
+```{r}
+ztest <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  zscore <- (sampmean-df)/(sd/sqrt(n))
+  pval <- 2*pnorm(-abs(zscore))
+  pval <= 0.05
+}
+monte_carlo <- function(n, df, sd, k, FUN) {
+  results <- replicate(k, FUN(n, df, sd))
+  mean(results)
+}
+sizes = c(9, 27, 51)
+two_sidedz <- lapply(sizes, monte_carlo, 3, 2.45, 10000, ztest)
+two_sidedz
+```
+
+\newpage
+### Part b
+```{r}
+ztest2 <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  zscore <- (sampmean-df)/(sd/sqrt(n))
+  pval <- pnorm(zscore)
+  pval <= 0.05
+}
+left_sidedz <- lapply(sizes, monte_carlo, 3, 2.45, 10000, ztest2)
+left_sidedz
+```
+
+### Part c
+```{r}
+ztest3 <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  zscore <- (sampmean-df)/(sd/sqrt(n))
+  pval <- pnorm(zscore, lower.tail=FALSE)
+  pval <= 0.05
+}
+right_sidedz <- lapply(sizes, monte_carlo, 3, 2.45, 10000, ztest3)
+right_sidedz
+```
+
+\newpage
+## Problem 3
+```{r}
+resultsz <- cbind(two_sided=two_sidedz, left_sided=left_sidedz, 
+                  right_sided=right_sidedz)
+row.names(resultsz) <- c("n=9", "n=27", "n=51")
+resultsz
+```
+As sample size increases, the test commits type 1 errors closer to 5% of the time. The error for the left sided test is very low at small sample sizes, whereas the error for the right sided test is higher at small sample sizes, and both normalize to 0.05 as n increases.
+
+## Problem 4
+### Part a
+```{r}
+ttest <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  sampsd <- sd(samp)
+  zscore <- (sampmean-df)/(sampsd/sqrt(n))
+  pval <- 2*pt(-abs(zscore), n-1)
+  pval <= 0.05
+}
+two_sidedt <- lapply(sizes, monte_carlo, 3, 2.45, 10000, ttest)
+two_sidedt
+```
+
+\newpage
+### Part b
+```{r}
+ttest2 <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  sampsd <- sd(samp)
+  zscore <- (sampmean-df)/(sampsd/sqrt(n))
+  pval <- pt(zscore, n-1)
+  pval <= 0.05
+}
+left_sidedt <- lapply(sizes, monte_carlo, 3, 2.45, 10000, ttest2)
+left_sidedt
+```
+
+### Part c
+```{r}
+ttest3 <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  sampsd <- sd(samp)
+  zscore <- (sampmean-df)/(sampsd/sqrt(n))
+  pval <- pt(zscore, n-1, lower.tail=FALSE)
+  pval <= 0.05
+}
+right_sidedt <- lapply(sizes, monte_carlo, 3, 2.45, 10000, ttest3)
+right_sidedt
+```
+
+\newpage
+## Problem 5
+```{r}
+resultst <- cbind(two_sided=two_sidedt, left_sided=left_sidedt, 
+                  right_sided=right_sidedt)
+row.names(resultst) <- c("n=9", "n=27", "n=51")
+resultst
+```
+As sample size increases, the test commits type 1 errors closer to 5% of the time. The error for the left sided test is higher at small sample sizes, whereas the error for the right sided test is lower at small sample sizes, and both normalize to 0.05 as n increases.
+
+## Problem 6
+### Part a
+```{r}
+incztest <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  sampsd <- sd(samp)
+  zscore <- (sampmean-df)/(sampsd/sqrt(n))
+  pval <- 2*pnorm(-abs(zscore))
+  pval <= 0.05
+}
+two_sidedincz <- lapply(sizes, monte_carlo, 3, 2.45, 10000, incztest)
+two_sidedincz
+```
+
+\newpage
+### Part b
+```{r}
+incztest2 <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  sampsd <- sd(samp)
+  zscore <- (sampmean-df)/(sampsd/sqrt(n))
+  pval <- pnorm(zscore)
+  pval <= 0.05
+}
+left_sidedincz <- lapply(sizes, monte_carlo, 3, 2.45, 10000, incztest2)
+left_sidedincz
+```
+
+### Part c
+```{r}
+incztest3 <- function(n, df, sd) {
+  samp <- rchisq(n, df)
+  sampmean <- mean(samp)
+  sampsd <- sd(samp)
+  zscore <- (sampmean-df)/(sampsd/sqrt(n))
+  pval <- pnorm(zscore, lower.tail=FALSE)
+  pval <= 0.05
+}
+right_sidedincz <- lapply(sizes, monte_carlo, 3, 2.45, 10000, incztest3)
+right_sidedincz
+```
+
+\newpage
+## Problem 7
+```{r}
+resultsincz <- cbind(two_sided=two_sidedincz, left_sided=left_sidedincz, 
+                  right_sided=right_sidedincz)
+row.names(resultsincz) <- c("n=5", "n=21", "n=48")
+resultsincz
+```
+As sample size increases, even the incorrectly performed z test commits type 1 errors closer to 5% of the time. However, the pattern in the errors is similar to the t test in that the error for the left sided test is higher at small sample sizes, whereas the error for the right sided test is lower at small sample sizes, and both normalize to 0.05 as n increases.

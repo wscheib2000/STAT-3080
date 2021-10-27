@@ -1,0 +1,120 @@
+---
+title: "Homework 3" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+```
+
+## Problem 1
+### Part a
+```{r}
+mean_norm <- 99.5
+sd_norm <- 4.8
+alpha_norm <- 0.05
+```
+
+### Part b
+```{r}
+sample_norm <- function(n) {
+  sub <- rnorm(n, mean_norm, sd_norm)
+  samp_mean <- mean(sub)
+  z_stat <- (mean_norm-samp_mean)/(sd_norm/sqrt(n))
+  2*pnorm(-abs(z_stat)) < 0.05
+}
+
+sample_norm(27)
+```
+
+### Part c
+```{r}
+mean(replicate(10000, sample_norm(27)))
+```
+
+### Part d
+Theoretically, the proportion should be 0.05.
+
+### Part e
+```{r}
+rep_norm <- function(n) {
+  mean(replicate(10000, sample_norm(n)))
+}
+
+sapply(c(9, 27, 51), rep_norm)
+```
+
+### Part f
+```{r}
+sapply(3:51, rep_norm)
+```
+
+### Part g
+They don't change in any consistent way. Sample size does not seem to affect the results.
+\newpage
+
+## Problem 2
+### Part a
+```{r}
+nym2019 <- read.table("data/nym2019.txt", header=TRUE)
+head(nym2019)
+```
+
+### Part b
+```{r}
+nrow(nym2019)
+```
+
+### Part c
+```{r}
+nym2019[nchar(nym2019$HomeStateOrCountry) == 2,"HomeStateOrCountry"] <- "USA"
+nrow(nym2019[nym2019$HomeStateOrCountry == "USA",])
+```
+\newpage
+### Part d
+```{r}
+table(nym2019$HomeStateOrCountry)
+```
+
+### Part e
+```{r}
+length(unique(nym2019$HomeStateOrCountry))
+```
+
+### Part f
+```{r}
+young_old <- c(youngest=min(nym2019$Age), oldest=max(nym2019$Age))
+young_old
+```
+
+### Part g
+```{r}
+fast_slow <- c(
+  fastest=nym2019[nym2019$Time==min(nym2019$Time),"Age"],
+  slowest=nym2019[nym2019$Time==max(nym2019$Time),"Age"]
+)
+fast_slow
+```
+
+### Part h
+```{r}
+nrow(nym2019[nym2019$DivPlace<=20,])
+```
+Part i
+```{r}
+sort(unique(nym2019[nym2019$DivPlace <= 20,"DIV"]))
+```
+
+### Part j
+```{r}
+nym2019[nym2019$DivPlace <= 5,]
+```
+
+### Part k
+```{r}
+tapply(nym2019$Age, nym2019$BostonQualifier, mean)
+```

@@ -1,0 +1,160 @@
+---
+title: "Homework 1" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+```
+
+## Problem 1  
+
+### a
+```{r}
+a <- seq(4751, 4835, 7)
+a
+```
+
+### b
+```{r}
+b <- rep("Night", 5)
+b
+```
+
+### c
+```{r}
+c <- seq(89, 101, 1)
+c
+```
+
+### d
+```{r}
+d <- rep(seq(21, 18, -1), rep(3, 4))
+d
+```
+
+### e
+```{r}
+e <- seq(75, 57, -3)
+e
+```
+
+### f
+```{r}
+f <- c(seq(25, 75, 10), seq(70, 50, -5))
+f
+```
+
+### g
+```{r}
+g <- rep(seq(400, 500, 25), seq(5, 1, -1))
+g
+```
+
+### h
+```{r}
+h <- rep(seq(3, 1, -1), 5)
+h
+```
+
+### i
+```{r}
+i <- c(seq(124, 68, -8), seq(63, 38, -5))
+i
+```
+### j
+```{r}
+j <- rep(c("Morning", "Afternoon", "Night"), 2)
+j
+```  
+
+## Problem 2 
+
+### a
+```{r}
+pnorm(26.24, mean = 63, sd = 11)
+```
+The probability that a runner runs this 10k faster than 26.24 minutes is approximately 0.0004%. 
+
+### b
+```{r}
+qnorm(0.05, mean = 63, sd = 11)
+```
+The runner should have a goal time of about 42 minutes and 30 seconds.
+
+### c
+```{r}
+29000*(1-pnorm(90, mean = 63, sd = 11))
+```
+I would expect about 205 runners to have their races disrupted.
+
+## Problem 3 
+
+### a
+```{r}
+1-pbinom(0, size = 12, prob = 0.2)
+```
+The probability that the lie detector indicates that at least one of the applicants is lying is 93.1%. 
+
+### b
+```{r}
+input <- 0:11
+results <- round(1-pbinom(input, size = 12, prob = 0.2), 3)
+results
+```
+
+### c
+```{r}
+desc <- 1:12
+desc_results <- rbind(desc, results)
+desc_results
+```
+The descriptor values also show 3 decimal places. 
+
+### d
+```{r}
+names(results) <- desc
+results
+```
+
+### e
+The labeled vector is easier to read because the label numbers stay in a sensible format. 
+
+### f
+```{r}
+results_df <- data.frame(desc=desc, prob=results)
+results_df
+```
+
+### g
+```{r}
+results_df2 <- data.frame(prob=results)
+results_df2
+```
+
+### h
+The second one, because the data.frame already has row labels, which are essentially what the descriptors vector contains.  
+
+## Problem 4   
+```{r}
+name <- "Gretchen Martinet"
+dep <- "Statistics"
+courses <- c("STAT 2559", "STAT 3080")
+names(courses) <- c("Course1", "Course2")
+act <- c(FALSE, TRUE)
+names(act) <- c("Course1", "Course2")
+enr <- list(Course1 = 5, Course2 = c(75, 90, 90))
+days <- list(
+  Course1 = c("Tuesday", "Thursday"),
+  Course2 = cbind(c("Monday", "Tuesday", "Tuesday"),
+                  c("Wednesday", "Thursday", "Thursday"))
+)
+
+mylist <- list(Name = name, Department = dep, Courses = courses,
+               ActiveTeach = act, Enr = enr, Days = days)
+mylist
+```

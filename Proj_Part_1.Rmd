@@ -1,0 +1,25 @@
+---
+title: "Project Part 1" 
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+header-includes:
+- \usepackage{setspace}
+- \onehalfspacing
+---
+
+## Topic of Interest
+My topic of interest is alternative assets investing, particularly in the fine wine market. I find alternative markets to be fascinating because there is still so much market inefficiency to be capitalized on. Wine investing is a relatively new idea, and companies like Vinovest and Vint are working to open the market to retail investors.
+
+## Research Questions
+### 1. What are the biggest factors that influence a red wine quality rating?
+
+### 2. What are the biggest factors that influence a red wine price?
+
+### 3. How do wine investing returns compare to standard asset class investing?
+
+## Populations of Interest and Data Description
+The population of interest for the first and second research questions is red wines. The data will describe various attributes of the composition and production of different red wines, their rating score, and their price.
+
+The population of interest for the third research question is asset classes, namely all of the standard ones (stock market, real estate, etc.) plus wine. The data will describe returns on investment for each asset class over multiple time periods (1 year, 3 years, 5 years, ..., 15 years).

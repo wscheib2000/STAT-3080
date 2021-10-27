@@ -1,0 +1,167 @@
+---
+title: "Homework 2" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+library(car)
+```
+
+## Problem 1
+### Part a
+```{r}
+commutes <- matrix(
+  data=c(25, 22, 36, 23, 21, 36, 34, 33, 25, 32),
+  ncol=2,
+  byrow=TRUE
+)
+commutes
+```
+
+### Part b
+```{r}
+colnames(commutes) <- c("Week1", "Week2")
+rownames(commutes) <- c("Monday", "Tuesday", "wednesday", "Thursday", "Friday")
+commutes
+```
+\newpage
+### Part c
+```{r}
+apply(commutes, 1, function(row) {row["Week1"]>row["Week2"]})
+```
+
+### Part d
+```{r}
+apply(commutes, 1, mean)
+```
+
+### Part e
+```{r}
+diff <- commutes - 27
+diff
+```
+
+### Part f
+```{r}
+apply(diff, 2, mean)
+```
+
+### Part g
+```{r}
+apply(diff, 2, max)
+```
+
+### Part h
+```{r}
+rownames(commutes)[commutes[,2]<30]
+```
+
+### Part i
+```{r}
+apply(diff, 2, function(col) {sum(col<=0)})
+```
+
+### Part j
+```{r}
+rownames(diff)[diff[,1]==min(diff[,1])]
+```
+
+### Part k
+```{r}
+diff[diff[,1]*diff[,2]>0,]
+```
+
+## Problem 2
+### Part a
+```{r}
+weight.metric <- Davis[,c("weight", "repwt")]
+head(weight.metric)
+```
+
+### Part b
+```{r}
+weight.imp <- weight.metric * 2.2
+head(weight.imp)
+```
+
+### Part c
+```{r}
+height.metric <- Davis[,c("height", "repht")]
+head(height.metric)
+```
+
+### Part d
+```{r}
+height.imp <- round(height.metric / 2.54, 1)
+head(height.imp)
+```
+\newpage
+### Part e
+```{r}
+Davis.imp <- data.frame(
+  sex=Davis$sex,
+  rec.weight=weight.imp$weight,
+  rep.weight=weight.imp$repwt,
+  rec.height=height.imp$height,
+  rep.height=height.imp$repht
+)
+head(Davis.imp)
+```
+
+### Part f
+```{r}
+apply(Davis.imp, 2, function(col) {sum(is.na(col))})
+```
+
+### Part g
+```{r}
+nrow(Davis.imp[is.na(Davis.imp$rep.weight) | is.na(Davis.imp$rep.height),])
+```
+
+### Part h
+```{r}
+Davis.imp[is.na(Davis.imp$rep.weight) | is.na(Davis.imp$rep.height), "sex"]
+```
+
+## Problem 3
+### Part a
+```{r}
+planets <- data.frame(
+  name=c("Mercury", "Venus", "Earth", "Mars",
+         "Jupiter", "Saturn", "Uranus", "Neptune"),
+  distance=c(0.39, 0.72, 1, 1.52, 5.2, 9.54, 19.18, 30.06),
+  type=c("terrestrial", "terrestrial", "terrestrial", "terrestrial",
+         "gas", "gas", "gas", "gas"),
+  diameter=c(0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883),
+  rotation=c(58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67),
+  rings=c("N", "N", "N", "N", "Y", "Y", "Y", "Y"),
+  moons=c("0", "0", "1", "2+", "2+", "2+", "2+", "2+"),
+  stringsAsFactors=TRUE
+)
+planets
+```
+
+### Part b
+```{r}
+planets[planets$diameter<5,]
+```
+
+### Part c
+```{r}
+planets[planets$rotation<0, "distance"]
+```
+
+### Part d
+```{r}
+planets[planets$diameter>1, c("name", "rings", "type")]
+```
+
+### Part e
+```{r}
+planets[planets$moons=="2+", c("rings", "type")]
+```

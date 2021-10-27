@@ -1,0 +1,109 @@
+---
+title: "Homework 6" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+library(tidyverse)
+```
+
+## Problem 1
+### Part a
+```{r}
+nym2019 <- read.table("data/nym2019.txt", header=TRUE)
+
+ggplot(nym2019, aes(x=DivAge)) + geom_bar(fill="white", color="gray")
+```
+
+### Part b
+```{r}
+ggplot(nym2019, aes(x=DivAge, fill=Sex)) + geom_bar(position="dodge")
+```
+
+### Part c
+```{r}
+ggplot(nym2019, aes(x=DivAge, fill=DivAge)) + geom_bar(position="dodge") + facet_grid(.~Sex)
+```
+
+### Part d
+The mean age for men is older than the mean age for women. Also, far more men than women ran the Boston Marathon in 2019.
+
+### Part e
+The distributions of men and women are actually very similar.
+
+### Part f
+```{r}
+ggplot(nym2019, aes(x=DivAge, y=Time)) +
+  stat_summary(geom="bar", fun="median", position="dodge", fill="white", color="black") + 
+  stat_summary(fun.data=median_hilow, fun.args=c(conf.int=0.5), geom="errorbar", width=0.2)
+```
+
+### Part g
+Older finishers finish more slowly.
+
+
+## Problem 2
+```{r}
+state_crashes <- read.csv("data/state crashes.csv")
+
+state_crashes$Hand.held.ban <- factor(
+  state_crashes$Hand.held.ban,
+  labels=c("no", "for some drivers", "yes")
+)
+
+Graphic2 <- ggplot(
+    state_crashes,
+    aes(
+      x=Licensed.drivers, y=Fatal.crashes,
+      color=Hand.held.ban, fill=Hand.held.ban
+    )
+) +
+  geom_point(shape=8) +
+  scale_color_manual(values=c("blue", "orange", "dark gray")) +
+  scale_fill_manual(values=c("blue", "orange", "dark gray")) +
+  geom_smooth(method=lm, alpha=0.3)
+
+Graphic2 + labs(title="State level information on fatal car accidents in 2019",
+                x="Number of licensed drivers (millions)", y="Number of fatal accidents",
+                color="Hand−held electronic ban", fill="Hand−held electronic ban") +
+  theme(legend.position=c(1,0), legend.justification=c(1,0))
+```
+
+## Problem 3   
+```{r}
+fatalities <- read.csv("data/fatalities.csv")
+fatalities <- fatalities <- fatalities %>%
+  mutate(Fatalities.Prop.Registered.Vehicles=Fatalities/(Registered.Vehicles*10^3))
+
+Graphic3 <- ggplot(fatalities, aes(x=Year, y=Fatalities.Prop.Registered.Vehicles, color=State)) +
+  geom_line() +
+  geom_point()
+
+Graphic3 + 
+  labs(title="Car accident fatalities from 1994 to 2019", x="Year",
+       y="Fatalities as percentage of vehicles registered in state") +
+  scale_x_continuous(breaks=1994:2019) +
+  scale_y_continuous(breaks=seq(0, 0.0003, 0.00005), labels=scales::percent) +
+  theme(axis.text.x=element_text(angle=90))
+```
+
+## Problem 4 
+```{r}
+Graphic4 <- ggplot(nym2019, aes(x=DivAge, y=..prop.., group=Sex, fill=DivAge)) +
+  geom_bar(position="dodge") + facet_grid(.~Sex)
+
+sex_labs <- c("Female", "Male")
+names(sex_labs) <- c("F", "M")
+Graphic4 + labs(title="Select 2019 NYC Marathon finishers", x="Age division",
+                y="Proportion of finishers of each sex assigned at birth") +
+  facet_grid(.~Sex, labeller=labeller(Sex=sex_labs)) +
+  theme(strip.background = element_rect(colour="black", fill="white"))
+```
+
+## Problem 5 
+The distribution of number of people involved in fatal accidents in Virginia more closely resembles the Chi Squared distribution with degrees of freedom 2 than the normal distribution. Also, most fatal accidents occur with fewer people involved. The maximum number of people involved in a fatal accident in Virginia in 2018 was 8, and the fewest was 1. The highest density of the fatal crashes were single car and single person crashes.

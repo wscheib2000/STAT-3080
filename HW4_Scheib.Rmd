@@ -1,0 +1,106 @@
+---
+title: "Homework 4" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+library(tidyverse)
+```
+
+## Problem 1   
+### Part a
+```{r}
+fatal_accidents <- read.csv("data/fatal accidents.csv")
+head(fatal_accidents)
+```
+
+### Part b
+```{r}
+state.list <- split(fatal_accidents, fatal_accidents$State)
+#https://stackoverflow.com/questions/15377238/r-subsetting-a-data-frame-into-
+#multiple-data-frames-based-on-multiple-column-val
+```
+\newpage
+### Part c
+```{r}
+lapply(state.list, head, n=3)
+```
+
+### Part d
+```{r}
+percent_table <- function(state) {
+  round(100*table(state$Day.of.week)/nrow(state), 1)
+}
+
+lapply(state.list, percent_table)
+```
+
+### Part e
+Accidents occur at approximately the same rate on every day in every state with the exception of spikes on Friday in the District of Columbia and weekends in the other four.
+
+### Part f
+```{r}
+percent_table2 <- function(state) {
+  table(state$Day.of.week, state$Vehicle.count)
+}
+
+lapply(state.list, percent_table2)
+```
+
+### Part g
+Substituting names of days for numbers would make the data much more readable.
+
+\newpage
+## Problem 2   
+### Part a
+```{r}
+fatal_accidents2 <- fatal_accidents %>% mutate(People.count=People.count.IN+People.count.OUT)
+head(fatal_accidents2)
+```
+
+### Part b
+```{r}
+fatal_accidents2 %>%
+  group_by(State) %>%
+  summarize(avg.Vehicles=mean(Vehicle.count), avg.People=mean(People.count))
+```
+\newpage
+### Part c
+```{r}
+fatal_accidents2 %>%
+  group_by(State) %>%
+  summarize(
+    min.Vehicles=min(Vehicle.count),
+    avg.Vehicles=mean(Vehicle.count),
+    max.Vehicles=max(Vehicle.count)
+  )
+```
+
+### Part d
+There tend to be more vehicles involved in crashes in Maryland than anywhere else and more people involved in crashes in DC than anywhere else.
+
+### Part e
+```{r}
+fatal_accidents2 %>%
+  filter(State=="Virginia") %>%
+  count(Month)
+```
+
+### Part f
+```{r}
+fatal_accidents2 %>%
+  filter(State=="Virginia", Month %in% 6:8) %>%
+  group_by(Day.of.week, Month) %>%
+  summarize(
+    med.Vehicles=median(Vehicle.count),
+    avg.Vehicles=mean(Vehicle.count)
+  )
+```
+
+### Part g
+There are more accidents in the fall (September, October, November) than any other time. Also, it is very hard to interpret information from the second tibble.
