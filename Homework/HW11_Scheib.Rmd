@@ -1,0 +1,115 @@
+---
+title: "Homework 11" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+
+library(pwr)
+```
+
+```{r}
+set.seed(06072000)
+```
+
+## Problem 1
+```{r}
+ztest <- function(n, prob, alternative, correct) {
+  sample <- rbinom(1, n, prob)
+  prop.test(sample, n, p=prob, alternative=alternative, correct=FALSE)$p.val < 0.05
+}
+monte_carlo <- function(n, prob, alternative, correct, k, FUN) {
+  results <- replicate(k, FUN(n, prob, alternative, correct))
+  mean(results)
+}
+```
+
+### a
+```{r}
+left.wo1 <- monte_carlo(104, 0.5, "less", FALSE, 10000, ztest)
+left.wo1
+```
+
+### b
+```{r}
+left.w1 <- monte_carlo(104, 0.5, "less", TRUE, 10000, ztest)
+left.w1
+```
+
+### c
+```{r}
+right.wo1 <- monte_carlo(104, 0.5, "greater", FALSE, 10000, ztest)
+right.wo1
+```
+
+### d
+```{r}
+right.w1 <- monte_carlo(104, 0.5, "greater", TRUE, 10000, ztest)
+right.w1
+```
+
+### e
+```{r}
+two.wo1 <- monte_carlo(104, 0.5, "two.sided", FALSE, 10000, ztest)
+two.wo1
+```
+
+### f
+```{r}
+two.w1 <- monte_carlo(104, 0.5, "two.sided", TRUE, 10000, ztest)
+two.w1
+```
+
+## Problem 2
+```{r}
+ztest <- function(n, prob, alternative, correct) {
+  sample <- rbinom(1, n, prob)
+  prop.test(sample, n, p=prob, alternative=alternative, correct=FALSE)$p.val < 0.05
+}
+monte_carlo <- function(n, prob, alternative, correct, k, FUN) {
+  results <- replicate(k, FUN(n, prob, alternative, correct))
+  mean(results)
+}
+```
+
+### a
+```{r}
+left.wo1 <- monte_carlo(104, 0.5, "less", FALSE, 10000, ztest)
+left.wo1
+```
+
+### b
+```{r}
+left.w1 <- monte_carlo(104, 0.5, "less", TRUE, 10000, ztest)
+left.w1
+```
+
+### c
+```{r}
+right.wo1 <- monte_carlo(104, 0.5, "greater", FALSE, 10000, ztest)
+right.wo1
+```
+
+### d
+```{r}
+right.w1 <- monte_carlo(104, 0.5, "greater", TRUE, 10000, ztest)
+right.w1
+```
+
+### e
+```{r}
+two.wo1 <- monte_carlo(104, 0.5, "two.sided", FALSE, 10000, ztest)
+two.wo1
+```
+
+### f
+```{r}
+two.w1 <- monte_carlo(104, 0.5, "two.sided", TRUE, 10000, ztest)
+two.w1
+```
+

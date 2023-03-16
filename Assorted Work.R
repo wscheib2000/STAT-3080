@@ -23,14 +23,17 @@ sum(replicate(reps, ztest(27, mu, sd, alpha)))/reps
 sum(replicate(reps, ztest(51, mu, sd, alpha)))/reps
 
 
-ttest <- function(n, mu, sd, alpha) {
-  sample <- rnorm(n, mu, sd)
-  samp_mean <- mean(sample)
-  samp_sd <- sd(sample)
-  t_stat <- (samp_mean-mu)/(samp_sd/sqrt(n))
-  p_val <- 2*pt(-abs(t_stat), n-1)
-  p_val < alpha
+ttest <- function(n, mu_0, sd, alpha) {
+  sample <- rnorm(n, 2.30, sd)
+  t.test(sample, alternative="two.sided", mu=2.31, conf.level=0.95)$p.val < alpha
+  # samp_mean <- mean(sample)
+  # samp_sd <- sd(sample)
+  # t_stat <- (samp_mean-mu_0)/(samp_sd/sqrt(n))
+  # p_val <- 2*pt(-abs(t_stat), n-1)
+  # p_val < alpha
 }
+
+replicate(10, mean(replicate(10000, ttest(400, 2.31, 0.16, 0.05))))
 
 sum(replicate(reps, ttest(9, mu, sd, alpha)))/reps
 sum(replicate(reps, ttest(27, mu, sd, alpha)))/reps
@@ -108,3 +111,49 @@ boot_diffs_null <- replicate(B, rand.test(length(samp_data)))
 ## Determine the p-value (left-tailed)
 sum(boot_diffs_null <= samp_diff)/B
 
+
+sizes <- c(9, 27, 51)
+sign.test <- function(n, df, dir, null.hyp) {
+  v <- sum(rchisq(n, df)>null.hyp)[1]
+  binom.test(v, n, alternative=dir)$p.value < 0.05
+}
+sign.rank.test <- function(n, df, dir, null.hyp) {
+  v <- rchisq(n, df)
+  wilcox.test(v, mu=null.hyp, alternative=dir)$p.value < 0.05
+}
+rank.sum.test <- function(n, df, dir, null.hyp, std.dev) {
+  v1 <- rchisq(n, df)
+  v2 <- rnorm(n, null.hyp, std.dev)
+  wilcox.test(v1, v2, alternative=dir)$p.value < 0.05
+}
+monte_carlo <- function(n, df, dir, null.hyp, k, FUN, std.dev=FALSE) {
+  if(std.dev) {
+    results <- replicate(k, FUN(n, df, dir, null.hyp, std.dev))
+  } else {
+    results <- replicate(k, FUN(n, df, dir, null.hyp))
+  }
+  mean(results)
+}
+
+sapply(sizes, monte_carlo, 75, "greater", 74.3344, 10000, sign.test)
+sapply(sizes, monte_carlo, 75, "greater", 74.3344, 10000, sign.rank.test)
+sapply(sizes, monte_carlo, 2, "greater", 1.386294, 10000, sign.test)
+sapply(sizes, monte_carlo, 2, "greater", 1.386294, 10000, sign.rank.test)
+sapply(sizes, monte_carlo, 75, "greater", 74.3344, 10000, rank.sum.test, 12.25)
+sapply(sizes, monte_carlo, 2, "greater", 1.386294, 10000, rank.sum.test, 2)
+
+
+one.samp.z.test <- function(n, p, dir) {
+  samp <- rbinom(1, n, p)
+  prop.test(samp, n, p=p, alternative=dir, correct=FALSE)$p.value < 0.05
+}
+monte_carlo <- function(n, p, dir, k, FUN) {
+  set.seed(3080)
+  results <- replicate(k, FUN(n, p, dir))
+  mean(results)
+}
+sizes <- c(9, 27, 51, 78, 103)
+
+sapply(sizes, monte_carlo, 0.5, "greater", 10000, rt.1samp.z.test)
+sapply(sizes, monte_carlo, 0.3, "greater", 10000, rt.1samp.z.test)
+sapply(sizes, monte_carlo, 0.1, "greater", 10000, rt.1samp.z.test)

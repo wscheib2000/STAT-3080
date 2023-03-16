@@ -1,0 +1,177 @@
+---
+title: "Homework 8" 
+author: "Will Scheib"
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+library(magrittr)
+library(tidyverse)
+```
+
+```{r}
+set.seed(06072000)
+```
+
+## Problem 1
+### a
+```{r}
+data1 <- read.csv("data/data1.csv")
+pop.cor.data1 <- cor(data1$V1, data1$V2)
+pop.cor.data1
+```
+
+### b
+```{r}
+ttest.paired <- function(data) {
+  samp <- data[sample(nrow(data), 13),]
+  t.test(samp[,1], samp[,2], mu=0, alternative="two.sided", paired=TRUE)$p.value < 0.05
+}
+paired.data1 <- mean(replicate(10000, ttest.paired(data1)))
+paired.data1
+```
+
+### c
+```{r}
+ttest.two.samp <- function(data) {
+  samp <- data[sample(nrow(data), 13),]
+  t.test(samp[,1], samp[,2], mu=0, alternative="two.sided")$p.value < 0.05
+}
+two.samp.data1 <- mean(replicate(10000, ttest.two.samp(data1)))
+two.samp.data1
+```
+
+\newpage
+## Problem 2
+### a
+```{r}
+data2 <- read.csv("data/data2.csv")
+pop.cor.data2 <- cor(data2$V1, data2$V2)
+pop.cor.data2
+```
+
+### b
+```{r}
+paired.data2 <- mean(replicate(10000, ttest.paired(data2)))
+paired.data2
+```
+
+### c
+```{r}
+two.samp.data2 <- mean(replicate(10000, ttest.two.samp(data2)))
+two.samp.data2
+```
+
+\newpage
+## Problem 3
+### a
+```{r}
+data3 <- read.csv("data/data3.csv")
+pop.cor.data3 <- cor(data3$V1, data3$V2)
+pop.cor.data3
+```
+
+### b
+```{r}
+paired.data3 <- mean(replicate(10000, ttest.paired(data3)))
+paired.data3
+```
+
+### c
+```{r}
+two.samp.data3 <- mean(replicate(10000, ttest.two.samp(data3)))
+two.samp.data3
+```
+
+\newpage
+## Problem 4
+```{r}
+results.table <- cbind(
+  data1=c(pop.cor=pop.cor.data1, paired=paired.data1, two.samp=two.samp.data1),
+  data2=c(pop.cor=pop.cor.data2, paired=paired.data2, two.samp=two.samp.data2),
+  data3=c(pop.cor=pop.cor.data3, paired=paired.data3, two.samp=two.samp.data3)
+)
+results.table
+```
+For two data sets that are symmetric and positively correlated, the Type I error for a two sample t-test will be smaller than 0.05. When they are negatively correlated, the Type I error for a two sample t-test will be larger than 0.05. When they are not correlated at all, the Type I error for a two sample t-test will be around 0.05. In all cases, the Type I error for a paired t-test is around 0.05.
+
+\newpage
+## Problem 5
+### a
+```{r}
+data4 <- read.csv("data/data4.csv")
+pop.cor.data4 <- cor(data4$V1, data4$V2)
+pop.cor.data4
+```
+
+### b
+```{r}
+paired.data4 <- mean(replicate(10000, ttest.paired(data4)))
+paired.data4
+```
+
+### c
+```{r}
+two.samp.data4 <- mean(replicate(10000, ttest.two.samp(data4)))
+two.samp.data4
+```
+
+\newpage
+## Problem 6
+### a
+```{r}
+data5 <- read.csv("data/data5.csv")
+pop.cor.data5 <- cor(data5$V1, data5$V2)
+pop.cor.data5
+```
+
+### b
+```{r}
+paired.data5 <- mean(replicate(10000, ttest.paired(data5)))
+paired.data5
+```
+
+### c
+```{r}
+two.samp.data5 <- mean(replicate(10000, ttest.two.samp(data5)))
+two.samp.data5
+```
+
+\newpage
+## Problem 7
+### a
+```{r}
+data6 <- read.csv("data/data6.csv")
+pop.cor.data6 <- cor(data6$V1, data6$V2)
+pop.cor.data6
+```
+
+### b
+```{r}
+paired.data6 <- mean(replicate(10000, ttest.paired(data6)))
+paired.data6
+```
+
+### c
+```{r}
+two.samp.data6 <- mean(replicate(10000, ttest.two.samp(data6)))
+two.samp.data6
+```
+
+\newpage
+## Problem 8
+```{r}
+results.table <- cbind(
+  data4=c(pop.cor=pop.cor.data4, paired=paired.data4, two.samp=two.samp.data4),
+  data5=c(pop.cor=pop.cor.data5, paired=paired.data5, two.samp=two.samp.data5),
+  data6=c(pop.cor=pop.cor.data6, paired=paired.data6, two.samp=two.samp.data6)
+)
+results.table
+```
+For two data sets that are skewed and positively correlated or not correlated, the Type I error for a two sample t-test will be smaller than 0.05. When they are negatively correlated, the Type I error for a two sample t-test will be larger than 0.05.
+
+For two data sets that are skewed and positively correlated, the Type I error for a paired t-test will be around 0.05. When they are negatively correlated, the Type I error for a paired t-test will be larger than 0.05. When they are not correlated at all, the Type I error for a paired t-test will be smaller than 0.05.

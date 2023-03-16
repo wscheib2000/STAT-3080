@@ -1,0 +1,111 @@
+---
+title: "Project Part 3" 
+fontsize: 12pt
+geometry: margin=1in
+urlcolor: black
+output: pdf_document
+header-includes:
+- \usepackage{setspace}
+- \onehalfspacing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, highlight=FALSE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+## Change of topic
+I realized very quickly that there is very little data on wine that exists. As a result, I decided to change my topic to urbanization and politics, into which I would love to dive more deeply. I am particularly intrigued by how the percentage of urban population affects the way states vote.
+
+\newpage
+## Data Description
+### Research Question
+Does the percent of a state population who lives in urban environments affect that state's election results?
+
+### General Context and Sources
+The urbanization data set comes from Iowa State University's Iowa Community Indicators Program (1). These data are a population that includes all 50 US states and the District of Columbia. The data were collected through the US Decennial Census. Each row represents a state (or DC) and each column represents a year of the Decennial Census (1900, 1910, 1920, etc.). One potential issue is that because there are less than 15 observations, the sample size will be too small. These data are appropriate for answering the research question because they are the defined predictor.
+
+```{r echo=FALSE}
+urban <- read.csv("data/urban.csv")
+names(urban)[1] <- "state"
+```
+
+The Senate election results data set comes from MIT's Election Data and Science Lab (2). These data are a population that includes all 50 US states. It is not clear on the MIT Election Lab website how the data were collected, but it is publicly available data. Each row represents a Senate candidate, and the columns include the year and state in which they were running, their name, their party, the number of votes they got, and the total number of votes. One potential issue is that the data will require a lot of quality checking, because there are a few results that seem to be coded incorrectly. For example, in Louisiana in 1978, where only one candidate was recorded, and they were only recorded to have recieved one vote.
+
+```{r echo=FALSE}
+#Cleaning pt.1
+elections <- read.csv("data/1976-2020-senate.csv")
+elections2 <- elections %>%
+  filter(special==FALSE, !is.na(candidate), writein==FALSE, unofficial==FALSE,
+         party_simplified %in% c("REPUBLICAN", "DEMOCRAT")) %>%
+  select(year, state, party_simplified, candidatevotes, totalvotes) %>%
+  write.csv("data/elections.csv")
+```
+
+```{r echo=FALSE}
+elections <- read.csv("data/elections.csv")
+```
+
+```{r echo=FALSE}
+#Cleaning pt.2
+elections_cleaned <- elections %>% select(-c(X)) %>%
+  pivot_wider(
+    names_from=party_simplified,
+    values_from=candidatevotes,
+    names_glue="{tolower(party_simplified)}",
+    values_fn=list(candidatevotes=sum)
+  ) %>% filter(!is.na(republican), !is.na(democrat)) %>%
+  mutate(year=factor(year), dem_prop=democrat/(democrat+republican)) %>%
+  select(year, state, dem_prop) %>%filter(dem_prop < 10)
+  
+urban_cleaned <- urban %>% pivot_longer(X1900:X2010, "year", values_to="urban_pct") %>%
+  mutate(
+    state=toupper(state),
+    year=factor(as.numeric(substring(year, 2))),
+    urban_prop=urban_pct/100
+  ) %>%
+  select(-c(urban_pct))
+
+data <- elections_cleaned %>% inner_join(urban_cleaned, by=c("year"="year", "state"="state"))
+```
+
+\newpage
+## Graphical Summary
+```{r}
+scatter <- ggplot(data, aes(x=urban_prop, y=dem_prop, color=year))
+scatter + geom_point() + facet_wrap(~year) +
+  labs(
+    title="Voting Behaviors and Urban Population",
+    x="Proportion of Population Living in Urban Centers",
+    y="Proportion of Major Party Votes for Democrats",
+    color="Census Year"
+  ) +
+  scale_x_continuous(n.breaks=6, limits=c(0,1)) +
+  scale_y_continuous(n.breaks=6, limits=c(0,1)) +
+  theme(
+    strip.background = element_rect(colour="gray50", fill="gray50"),
+    strip.text=element_text(color="white", face="bold"),
+  )
+```
+From the graphs, it looks like there is not much of a relationship between the two variables, except maybe in the years 2000 and 2010, where there is a small positive correlation.
+
+\newpage
+## Numerical Summary
+```{r}
+data %>% group_by(year) %>%
+  summarize(
+    mean_urban=mean(urban_prop),
+    sd_urban=sd(urban_prop),
+    mean_dem=mean(dem_prop),
+    sd_dem=sd(dem_prop),
+    urban_dem_cor=cor(urban_prop, dem_prop))
+```
+The numerical summary tells us that the population has become more urban over time, but the spread has stayed essentially the same. The population as a whole has also, however, voted less Democratic and more Republican in Senate elections over time, with the spread staying more or less constant. The correlation values parallel the conclusions drawn from the graphical summary, which are that in the two most recent Decennial Censuses, the proportion of the population that lives in urban areas has a slightly positive correlation with the proportion of major party votes for Democrats.
+
+\newpage
+## References
+1. Iowa State University Iowa Community Indicators Program <https://www.icip.iastate.edu/tables/population/urban-pct-states>
+2. MIT Election Data and Science Lab <https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/PEJ5QU>
